@@ -1,11 +1,11 @@
 # Text-Analysis-Project
 **1. Project Overview** (~1 paragraph)
 
-For this project, I analyzed F. Scott Fitzgerald's The Great Gatsby in particular, using the Project Gutenberg digital library as the primary data source. I used Characterizing by Word Frequencies,Computing Summary Statistics and Removing Stop words to understand the linguistic patterns of the novel. The main goal was to create a Python program that would analyze the textual content and reveal word usage patterns to help better understand the author's writing style and lexical choices.
+For this project, I analyzed F. Scott Fitzgerald's The Great Gatsby in particular, using the Project Gutenberg digital library as the primary data source. I used Characterizing by Word Frequencies,Computing Summary Statistics and Removing Stop words to understand the linguistic patterns of the novel, and implemented sentiment analysis using VADER and TextBlob. The main goal was to create a Python program that would analyze the textual content and reveal word usage patterns to help better understand the author's writing style and lexical choices.
 
 **2. Implementation** (~1-2 paragraphs)
 
-The system architecture is composed of four key components: URL-based text downloading from Project Gutenberg using urllib; removing boilerplate content and handling punctuation; processing word frequency and generating statistical summaries; and removing common English stop words.
+The system architecture is composed of five key components: URL-based text downloading from Project Gutenberg using urllib; removing boilerplate content and handling punctuation; processing word frequency and generating statistical summaries; removing common English stop words, and using two different ways to approache sentiment analysis
 
 In my design, I chose the character replacement method because strip() only removes characters from the beginning and end of a string, whereas replacement can handle punctuation in words. This is important for correctly handling abbreviations and embedded punctuation. For GenAI help, I use Claude to debug syntax errors in dictionary methods and to help me understand proper text cleanup techniques
 ![alt text](image.png)

@@ -1,5 +1,10 @@
 import urllib.request
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+from textblob import TextBlob
+import nltk
 
+
+    
 def download_text(url):
     with urllib.request.urlopen(url) as f:
         text = f.read().decode('utf-8')
@@ -7,8 +12,8 @@ def download_text(url):
     
 def clean_gutenberg_text(text): # find the main content
     """Remove project gutenberg boilerplate and clean the text"""
-    start_markers = "*** START OF THE PROJECT GUTENBERG EBOOK THE GREAT GATSBY ***"
-    end_markers = "*** END OF THE PROJECT GUTENBERG EBOOK THE GREAT GATSBY ***"
+    start_markers = ["*** START OF THE PROJECT GUTENBERG EBOOK THE GREAT GATSBY ***"]
+    end_markers = ["*** END OF THE PROJECT GUTENBERG EBOOK THE GREAT GATSBY ***"]
     start_position = len(text)
     for marker in start_markers: # start of main content
         position = text.find(marker)
@@ -36,7 +41,12 @@ def calculate_word_frequency(text):
     """
     words = text.lower().split()
     punctuation = ".,!?()[]{}:;"
-    cleaned_words = [word.replace(char,'') for word in words for char in punctuation]
+    cleaned_words = []
+    for word in words:
+        for char in punctuation:
+            word =word.replace(char,"")
+        if word:
+            cleaned_words.append(word)
     
     word_freq = {}
     for word in cleaned_words:
@@ -75,6 +85,33 @@ def remove_stop_words(words_frequency):
     filtered_frequency = {word: freq for word, freq in words_frequency.items() if word not in stop_words}
     return filtered_frequency
 
+def perform_sentiment_analysis(text):
+    """
+    perform sentiment analysis using both vader and text blob
+    """
+    try:
+        try:
+            nltk.data.find('sentiment/vader_lexicon.zip')
+        except LookupError:
+            nltk.download('vader_lexicon')
+    
+        vader_analyzer = SentimentIntensityAnalyzer()
+        vader_scores = vader_analyzer.polarity_scores(text)
+    
+        blob = TextBlob(text)
+        textblob_scores = {
+            'polarity': blob.sentiment.polarity,
+            'subjectivity': blob.sentiment.subjectivity
+        }
+        
+        return {
+            'vader': vader_scores,
+            'textblob': textblob_scores
+        }
+    except Exception as e:
+        print(f"Error in sentiment analysis: {str(e)}")
+        return None
+        
 def analyze_text(text):
     """
     show the analyze
@@ -101,11 +138,26 @@ def analyze_text(text):
     print("\nTop 10 most frequent words (excluding stop words):")
     for word, freq in filtered_stats['most_common_words']:
         print(f"'{word}': {freq} times")
+    print("\n=== Sentiment Analysis ===")
+    sentiment_scores = perform_sentiment_analysis(clean_text)
+    if sentiment_scores:
+        print("\nVADER Sentiment Scores:")
+        for key, value in sentiment_scores['vader'].items():
+            print(f"{key}: {value:.3f}")
+        print("\nTextBlob Sentiment Scores:")
+        print(f"Polarity: {sentiment_scores['textblob']['polarity']:.3f}")
+        print(f"Subjectivity: {sentiment_scores['textblob']['subjectivity']:.3f}")
 
 def main():
     url = 'https://www.gutenberg.org/cache/epub/64317/pg64317.txt'
-    text = download_text(url)
-    analyze_text(text)
+    try:
+        text = download_text(url)
+        analyze_text(text)
+    except Exception as e:
+        print(f"Error occurred: {str(e)}")
+        print("Please ensure you have internet connection and have installed required packages:")
+        print("pip install nltk textblob")
+        
 
 if __name__ == "__main__":
     main()
